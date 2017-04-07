@@ -1,1 +1,2 @@
-# serbian-alpr
+# Serbian Automatic License Plate Reader
+
