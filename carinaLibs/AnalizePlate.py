@@ -9,7 +9,7 @@ class AnalizePlate(object):
         self.last_plate = None
         self.alpr = None
         try:
-            self.alpr = Alpr("eu", "/etc/openalpr/openalpr.conf", "/usr/share/openalpr/runtime_data")
+            self.alpr = Alpr("rs", "/etc/openalpr/openalpr.conf", "/usr/share/openalpr/runtime_data")
             if not self.alpr.is_loaded():
                 print("Error loading OpenALPR")
         except:
