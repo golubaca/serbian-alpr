@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import urllib
+from scipy import ndimage
+
 
 class AnalizeFrame(object):
 
@@ -68,6 +70,27 @@ class AnalizeFrame(object):
 
         thresh = ((wh * 100) / (wh + bl)) * 10
         return thresh
+
+    def averegeBackground(self, image):
+        average_color_per_row = np.average(image, axis=0)
+        average_color = np.average(average_color_per_row, axis=0)
+        return average_color
+
+    def adjust_gamma(self, image, gamma=1.0):
+	    # build a lookup table mapping the pixel values [0, 255] to
+	    # their adjusted gamma values
+	    invGamma = 1.0 / gamma
+	    table = np.array([((i / 255.0) ** invGamma) * 255
+		    for i in np.arange(0, 256)]).astype("uint8")
+
+	    # apply gamma correction using the lookup table
+	    return cv2.LUT(image, table)
+	    
+    def rotate_image(self, image, angle):
+        image_center = tuple(np.array(image.shape)/2)
+        rot_mat = cv2.getRotationMatrix2D(image_center,angle,1.0)
+        result = cv2.warpAffine(image, rot_mat, image.shape,flags=cv2.INTER_LINEAR)
+        return result
 
     def snapshoot(self,url):
         # download the image, convert it to a NumPy array, and then read
