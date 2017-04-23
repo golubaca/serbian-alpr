@@ -9,7 +9,7 @@ Iako se ovaj projekat moze upotrebiti za bilo koju regiju, ukljucena su podesava
 - OpenCV (3+)
 - openALPR
 - nodeJS (frontend, nije obavezno)
-- Python 2.7 (scipy, numpy...)
+- Python 2.7 (scipy, numpy, imutils...)
 - Linux (Testirano na Ubuntu i CentOS) (Moguce je izmeniti kod kako bi funkcionisao i na windowsu)
 
 ## Uputstvo
