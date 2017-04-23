@@ -20,15 +20,6 @@ for camera in sections:
     if camera.startswith('Camera'):
         params = {}
         for key in items:
-            # name = config.get(camera, 'name')
-            # ip = config.get(camera, 'ip')
-            # protocol = config.get(camera, 'protocol')
-            # username = config.get(camera, 'username')
-            # passwd = config.get(camera, 'passwd')
-            # vendor = config.get(camera, 'vendor')
-            # rotation = config.get(camera, 'rotation')
-            # roi = config.get(camera, 'roi')
-            # droi = config.get(camera, 'detectregion')
             try:
                 params[key] = config.get(camera, key)
             except:
@@ -72,11 +63,10 @@ while True:
             print e
             exit(0)
     else:
-        # print "Ovde sam"
         try:
             for t in threads:
                 if not t[0].is_alive():
-                    print "Jebe tred, ubijamo ga nozem u ledja"
+                    print "Problemi u tredu, menjamo ga."
                     t[0].terminate()
                     t[0].join()
                     st = IPStream.IPStream(t[1])
