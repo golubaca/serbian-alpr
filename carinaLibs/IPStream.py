@@ -5,6 +5,7 @@ import AnalizePlate
 import time
 import thread
 import imutils
+import random
 
 
 
@@ -12,7 +13,8 @@ class IPStream(object):
     # name=None, ip_address=None, username=None, passwd=None, vendor="vivotek", protocol="rtsp", rotation=0, roi=None, detect_region=None, fps=3, resolution="1024x768"
     def __init__(self, params):
 
-        self.camera_name = params['name']
+        self.camera_name = params['name'] if params['name'] is not None else random.random()
+        print self.camera_name
         self.ip_address = params['ip']
         self.username = params['username']
         self.passwd = params['passwd']
@@ -22,12 +24,13 @@ class IPStream(object):
         self.roi = params['roi']
         self.detect_region = params['detectregion']
         self.fps = params['fps']
+        self.image_location = params['image_location']
+        self.thumbnail_location = params['thumbnail_location']
         self.resolution = params['resolution']
+        self.sensitivity = float(params['sensitivity']) if params['sensitivity'] is not None else 10
         self.analize_frame = AnalizeFrame.AnalizeFrame()
         self.analize_plate = AnalizePlate.AnalizePlate()
         self.helper = Helper.Helper()
-
-        print "Ime kamere:",self.camera_name
 
         self.url = self.helper.generate_url(self.ip_address, params['username'], params['passwd'], self.vendor, self.protocol, 1)
 
@@ -50,16 +53,14 @@ class IPStream(object):
 
     def tst(self,frame, image):
         try:
-            #frame = self.analize_frame.snapshoot(self.helper.generate_url(self.ip_address, self.username, self.passwd, self.vendor, 'snapshoot',0))
-            #self.analize_frame.rotate_image(frame,-15)
-            name = "/tmp/{}_{}.jpg".format(time.time(),self.ip_address)
+            name = "/tmp/{}_{}.jpg".format(time.time(),self.camera_name)
             cv2.imwrite(name,frame)
         except Exception as e:
             print "snap:",e
             return False
 
         try:
-            thread.start_new_thread(self.analize_plate.proccess, (image,name,self.ip_address))
+            thread.start_new_thread(self.analize_plate.proccess, (image,name,self.camera_name,self.image_location,self.thumbnail_location))
         except:
             return False
 
@@ -90,37 +91,30 @@ class IPStream(object):
                 # jpg = self.analize_frame.adjust_gamma(jpg,0.9)
                 # height = frame.shape[0]
                 try:
-                    # if self.roi:
-                    #     his = self.analize_frame.calcHist(frame[self.roi], True)
-                    # else:
-                    his = self.analize_frame.calcHist(frame, True)
+                    if self.roi:
+                        his = self.analize_frame.calcHist(frame[ht:hb, wt:wb], True)
+                    else:
+                        his = self.analize_frame.calcHist(frame, True)
                 except:
+                    his = 0
                     continue
-                # print his
                 now = time.time()
                 # print his
-                if his > 10 and now > pause:
-                    # print "proccess"
+                if his > self.sensitivity and now > pause:
                     pause = now+.2
                     
                     if self.detect_region:
                         thread.start_new_thread(self.tst, (jpg[dht:dhb, dwt:dwb],jpg,))
                     else:
                         thread.start_new_thread(self.tst, (jpg, jpg,))
-                    #pass
                 
                 if int(time.time()) % 40 == 0 and now > connCheck:
                     connCheck=now+2
                     self.helper.connectionNotify(self.camera_name)
 
-                # slika = self.analize_frame.foreground(frame, True, False)
+                # slika = self.analize_frame.foreground(frame[ht:hb, wt:wb], True, True)
 
-                # if self.roi:
-                #     cv2.imshow(str(self.ip_address),
-                #                frame[ht:hb, wt:wb])
-                #     # int(self.roi[0]):int(self.roi[1]), int(self.roi[2]):int(self.roi[3])
-                # else:
-                # cv2.imshow(str(self.ip_address), jpg)
+                # cv2.imshow(str(self.camera_name), frame)
                 # cv2.waitKey(1)
                 ret, jpg = stream.read()
             except KeyboardInterrupt:

@@ -14,7 +14,7 @@ config.read(".carinaConfig.ini")
 sections = config.sections()
 threads = []
 
-items = ['name','ip','protocol','username','passwd','vendor','resolution','rotation','roi','detectregion','fps']
+items = ['name','ip','protocol','username','passwd','vendor','resolution','rotation','roi','detectregion','fps','sensitivity']
 
 for camera in sections:
     if camera.startswith('Camera'):
@@ -25,11 +25,15 @@ for camera in sections:
             except:
                 params[key] = None
 
-        r = params['roi'].split(",")
-        params['roi'] = [a for a in r if a] if len(r)>2 else None
+        if params['roi']:
+            r = params['roi'].split(",")
+            params['roi'] = [a for a in r if a] if len(r) > 2 else None
 
-        dr = params['detectregion'].split(",")
-        params['detectregion'] = [a for a in dr if a] if len(dr) > 2 else None
+        if params['detectregion']:
+            dr = params['detectregion'].split(",")
+            params['detectregion'] = [a for a in dr if a] if len(dr) > 2 else None
+        params['image_location'] = config.get('storage','image')
+        params['thumbnail_location'] = config.get('storage', 'thumbnail')
 
         print params
         st = IPStream.IPStream(params)
@@ -63,10 +67,11 @@ while True:
             print e
             exit(0)
     else:
+        # print "Ovde sam"
         try:
             for t in threads:
                 if not t[0].is_alive():
-                    print "Problemi u tredu, menjamo ga."
+                    print "Greska u tredu, menjamo ga."
                     t[0].terminate()
                     t[0].join()
                     st = IPStream.IPStream(t[1])

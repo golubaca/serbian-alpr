@@ -1,0 +1,111 @@
+extends layout
+
+block content
+  div.container-fluid
+    div.row
+      div.col-md-8
+        img.img-responsive.live(style='-webkit-user-select: none',src="http://ip_camera/mjpg/video.mjpg")
+        #warning
+      .col-md-1.connection
+        p
+          h2 Carina2 
+          img#Carina2(src='/images/ok.png')
+        p
+          h2 Carina3 
+          img#Carina3(src='/images/ok.png')
+      div.col-md-3
+        div.list-group.slike
+
+    #exampleModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel')
+      .modal-dialog.modal-lg(role='document')
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') ×
+            h4#exampleModalLabel.modal-title Tablica:
+          .modal-body
+            img(src='#')
+
+
+
+  script(src="/socket.io/socket.io.js")
+  script(src="/javascripts/jquery-3.1.1.min.js")
+  script(src="/javascripts/bootstrap.min.js")
+  script.
+  
+    var carina2 = Date.now();
+    var carina3=Date.now();
+    var connOk = '/images/ok.png';
+    var connFalse = '/images/warn.png';
+    
+    function checkConnection(){
+      var sada = Date.now()
+      if (sada - carina2 > 1000*60*2){
+        console.log(sada-carina2)
+        $('#Carina2').attr("src", connFalse)
+      } else {
+        $('#Carina2').attr("src", connOk)
+      }
+      
+      if (sada - carina3 > 1000*45){
+        $('#Carina3').attr("src", connFalse)
+      } else {
+        $('#Carina3').attr("src", connOk)
+      }
+      
+    }
+    $(function(){
+      $(document).on('click','.live',function(e){
+        $(this).attr('src','');
+        $(this).attr('src',"http://ip_camera/mjpg/video.mjpg");
+      })
+      
+      
+      setInterval(checkConnection, 1000*60*2)
+    });
+    
+    var socket = io('//localhost:3000');
+    socket.on('socketToMe', function (data) {
+    
+      if ($('img').length > 6) {
+          $('.slike').children().last().hide();
+          $('.slike').children().last().remove();
+      }
+
+      if (data[2] != "0") {
+      wx = '<div class="alert alert-danger alert-dismissible" role="alert">';
+      wx += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+      wx += '<strong>Nalazi se u bazi!</strong> -'+ data[2] +' <img class="thumb img-responsive" src="http://localhost/carina-slike/'+data[0]+'.jpg" />';
+      wx += '</div>';
+      
+        $('#warning').html(wx)
+      }
+
+      var elem = '<a href="#" class="list-group-item" data-toggle="modal" data-target="#exampleModal" data-tablica="'+data[1]+'" data-img="http://localhost/carina-slike/'+data[0]+'.jpg">';
+      elem += '<h4 class="list-group-item-heading">'+data[1]+'</h4>';
+      elem += '<p class="list-group-item-text"><img class="thumb img-responsive" src="http://localhost/carina-slike/'+data[0]+'.jpg" /></p>';
+      elem += '</a>'
+      $('.slike').prepend(elem);
+
+      $('#exampleModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var tablica = button.data('tablica') // Extract info from data-* attributes
+        var image = button.data('img')
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this)
+        modal.find('.modal-title').text('Tablica: ' + tablica)
+        modal.find('.modal-body img').attr('src', image)
+      })
+
+    
+      
+    });
+    socket.on('checkConnection', function(data){
+        console.log(data[0])
+      if (data[0]=="Carina2"){
+        carina2 = Date.now()
+      } else{
+        carina3 = Date.now()
+      }
+    });
