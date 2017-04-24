@@ -2,7 +2,7 @@
 
 Projekat je tek u fazi alfa testiranja, i nije namenjen za ozbiljnu upotrebu.
 
-Iako se ovaj projekat moze upotrebiti za bilo koju regiju, ukljucena su podesavanja za srpsko podrucje. Tu se nalazi fajl koji je treniran na 40.000 srpskih tablica.
+Iako se ovaj projekat moze upotrebiti za bilo koju regiju, ukljucena su podesavanja za srpsko podrucje. Tu se nalazi fajl koji je treniran na 20.000 srpskih tablica.
 
 ## Zahtevi
 
@@ -19,7 +19,7 @@ Za rad je potreban .carinaConfig.ini fajl koji sadrzi podesavanja baze podataka,
 ## Mogucnosti konfiguracije
 
 #### kamera
-Sekcija: [Kamera1]... (Potrebno je da sekcija pocinje kljucnim parametrom kamera i da bude jedinstveno, npr Kamera1,Kamera2...)
+Sekcija: [Camera1]... (Potrebno je da sekcija pocinje kljucnim parametrom kamera i da bude jedinstveno, npr Camera1,Camera2...)
 - name: Ime kamere, nije obavezno,dodeljuje se genericko ukoliko nije navedeno
 - ip: IP adresa kamere (npr. 178.23.21.48, 192.168.1.10)
 - protocol: Protokol koji se koristi za konekciju (rtsp,http)
