@@ -26,10 +26,10 @@ class AnalizeFrame(object):
     def foreground(self, image, smooth=False, grayscale=False):
         """
         Extract foreground from background
-        :param image: 
-        :param smooth: 
-        :param grayscale: 
-        :return: 
+        :param image:
+        :param smooth:
+        :param grayscale:
+        :return:
         """
         if smooth and grayscale:
             image = self.toGrayscale(image)
@@ -43,22 +43,23 @@ class AnalizeFrame(object):
         mask_inv = cv2.bitwise_not(mask)
         return mask_inv
 
-    def smooth(self,image):
+    def smooth(self, image):
         """
         Smooth image using kernel
-        :param image: 
-        :return: 
+        :param image:
+        :return:
         """
-        smoothed = cv2.filter2D(image, -1, np.ones((self.kernel,self.kernel),np.float32)/self.kernel**2)
+        smoothed = cv2.filter2D(
+            image, -1, np.ones((self.kernel, self.kernel), np.float32) / self.kernel**2)
         return smoothed
 
-    def calcHist(self,image, foreground=False):
+    def calcHist(self, image, foreground=False):
         if foreground:
-            image = self.foreground(image,True,True)
+            image = self.foreground(image, True, True)
 
         hist, bins = np.histogram(image.ravel(), 256, [0, 256])
 
-        black, white= 0, 0
+        black, white = 0, 0
 
         for i in range(0, 127):
             black += hist[i]
@@ -77,22 +78,26 @@ class AnalizeFrame(object):
         return average_color
 
     def adjust_gamma(self, image, gamma=1.0):
-	    # build a lookup table mapping the pixel values [0, 255] to
-	    # their adjusted gamma values
-	    invGamma = 1.0 / gamma
-	    table = np.array([((i / 255.0) ** invGamma) * 255
-		    for i in np.arange(0, 256)]).astype("uint8")
+            # build a lookup table mapping the pixel values [0, 255] to
+            # their adjusted gamma values
+        invGamma = 1.0 / gamma
+        table = np.array([((i / 255.0) ** invGamma) * 255
+                          for i in np.arange(0, 256)]).astype("uint8")
 
-	    # apply gamma correction using the lookup table
-	    return cv2.LUT(image, table)
-	    
+        # apply gamma correction using the lookup table
+        return cv2.LUT(image, table)
+
     def rotate_image(self, image, angle):
-        image_center = tuple(np.array(image.shape)/2)
-        rot_mat = cv2.getRotationMatrix2D(image_center,angle,1.0)
-        result = cv2.warpAffine(image, rot_mat, image.shape,flags=cv2.INTER_LINEAR)
+        image_center = tuple(np.array(image.shape) / 2)
+        rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+        result = cv2.warpAffine(
+            image,
+            rot_mat,
+            image.shape,
+            flags=cv2.INTER_LINEAR)
         return result
 
-    def snapshoot(self,url):
+    def snapshoot(self, url):
         # download the image, convert it to a NumPy array, and then read
         # it into OpenCV format
         resp = urllib.urlopen(url)

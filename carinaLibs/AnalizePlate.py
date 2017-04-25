@@ -20,6 +20,7 @@ def notify(name, plate, active=False):
 
 
 class AnalizePlate(object):
+
     def __init__(self):
         """
         Simple script init, does not require any params.
@@ -28,7 +29,10 @@ class AnalizePlate(object):
         self.alpr = None
         self.db = DB.DB()
         try:
-            self.alpr = Alpr("rs", "/etc/openalpr/openalpr.conf", "/usr/share/openalpr/runtime_data")
+            self.alpr = Alpr(
+                "rs",
+                "/etc/openalpr/openalpr.conf",
+                "/usr/share/openalpr/runtime_data")
             if not self.alpr.is_loaded():
                 print("Error loading OpenALPR")
         except:
@@ -68,14 +72,16 @@ class AnalizePlate(object):
                 folder = obj.strftime("%d.%m.%Y")
                 ime = "{}_{}".format(time.time(), ip)
                 try:
-                    if not os.path.exists("{}{}".format(image_location, folder)):
+                    if not os.path.exists(
+                            "{}{}".format(image_location, folder)):
                         os.makedirs("{}{}".format(image_location, folder))
-                    if not os.path.exists("{}{}".format(thumbnail_location, folder)):
+                    if not os.path.exists("{}{}".format(
+                            thumbnail_location, folder)):
                         os.makedirs("{}{}".format(thumbnail_location, folder))
                     imwrite("{}{}/{}.jpg".format(image_location, folder, ime), img)
                     try:
-                        imwrite("{}{}/{}.jpg".format(thumbnail_location, folder, ime),
-                                resize(img, (0, 0), fx=0.3, fy=0.3))
+                        imwrite("{}{}/{}.jpg".format(thumbnail_location,
+                                                     folder, ime), resize(img, (0, 0), fx=0.3, fy=0.3))
                         thumb = True
                     except:
                         thumb = False
@@ -84,9 +90,15 @@ class AnalizePlate(object):
                 except Exception as e:
                     print e
                     return False
-                self.add_plate(results['results'][0]['plate'], kandidati, folder + "/" + ime, thumb)
+                self.add_plate(
+                    results['results'][0]['plate'],
+                    kandidati,
+                    folder + "/" + ime,
+                    thumb)
                 notify(folder + "/" + ime, results['results'][0]['plate'])
-                self.checkActivePlates(folder + "/" + ime, results['results'][0]['plate'])
+                self.checkActivePlates(
+                    folder + "/" + ime,
+                    results['results'][0]['plate'])
                 # print naziv, results['results'][0]['plate']
                 # return results
         try:
@@ -99,28 +111,29 @@ class AnalizePlate(object):
         try:
             if thumb:
                 self.db.execute(
-                    "INSERT INTO test (br_tablice, moguce_tablice,naziv,ostalo) VALUES ('{}', '{}','{}','thumb=true')".format(
+                    "INSERT INTO tablice (br_tablice, moguce_tablice,naziv,ostalo) VALUES ('{}', '{}','{}','thumb=true')".format(
                         tablica, kandidati, naziv))
             else:
                 self.db.execute(
-                    "INSERT INTO test (br_tablice, moguce_tablice,naziv) VALUES ('{}', '{}','{}')".format(
+                    "INSERT INTO tablice (br_tablice, moguce_tablice,naziv) VALUES ('{}', '{}','{}')".format(
                         tablica, kandidati, naziv))
             return True
         except:
             self.db = DB.DB()
             if thumb:
                 self.db.execute(
-                    "INSERT INTO test (br_tablice, moguce_tablice,naziv,ostalo) VALUES ('{}', '{}','{}','thumb=true')".format(
+                    "INSERT INTO tablice (br_tablice, moguce_tablice,naziv,ostalo) VALUES ('{}', '{}','{}','thumb=true')".format(
                         tablica, kandidati, naziv))
             else:
                 self.db.execute(
-                    "INSERT INTO test (br_tablice, moguce_tablice,naziv) VALUES ('{}', '{}','{}')".format(
+                    "INSERT INTO tablice (br_tablice, moguce_tablice,naziv) VALUES ('{}', '{}','{}')".format(
                         tablica, kandidati, naziv))
             return True
         return False
 
     def checkActivePlates(self, ime, plate):
-        res = self.db.execute("SELECT * FROM aktuelno WHERE tablica LIKE '%{}%'".format(plate))
+        res = self.db.execute(
+            "SELECT * FROM aktuelno WHERE tablica LIKE '%{}%'".format(plate))
         result = res.fetchall()
         # print result
         if len(result) > 0:

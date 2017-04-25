@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 ###############################################################################
 # Fajl startuje car-in sistem sa predefinisanim brojem kamera koje ucestvuju. #
 ###############################################################################
@@ -14,7 +16,19 @@ config.read(".carinaConfig.ini")
 sections = config.sections()
 threads = []
 
-items = ['name','ip','protocol','username','passwd','vendor','resolution','rotation','roi','detectregion','fps','sensitivity']
+items = [
+    'name',
+    'ip',
+    'protocol',
+    'username',
+    'passwd',
+    'vendor',
+    'resolution',
+    'rotation',
+    'roi',
+    'detectregion',
+    'fps',
+    'sensitivity']
 
 for camera in sections:
     if camera.startswith('Camera'):
@@ -31,16 +45,17 @@ for camera in sections:
 
         if params['detectregion']:
             dr = params['detectregion'].split(",")
-            params['detectregion'] = [a for a in dr if a] if len(dr) > 2 else None
-        params['image_location'] = config.get('storage','image')
+            params['detectregion'] = [
+                a for a in dr if a] if len(dr) > 2 else None
+        params['image_location'] = config.get('storage', 'image')
         params['thumbnail_location'] = config.get('storage', 'thumbnail')
 
-        print params
+        # print params
         st = IPStream.IPStream(params)
 
         p = multiprocessing.Process(target=st.start)
         p.start()
-        threads.append([p,params,True])
+        threads.append([p, params, True])
 
 reseter = 0
 while True:
@@ -82,13 +97,11 @@ while True:
                     threads.append(
                         [p, t[1], True])
 
-
             threads = [t for t in threads if t[2]]
-            reseter+=1
+            reseter += 1
             time.sleep(10)
         except Exception as e:
             print e
             continue
 
 print "Izlazim iz glavne petlje"
-
