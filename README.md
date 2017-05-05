@@ -1,6 +1,6 @@
 # Serbian Automatic License Plate Reader
 
-#DEMO
+DEMO:
 
 https://youtu.be/F1JOvA1UXHw
 
