@@ -1,5 +1,9 @@
 # Serbian Automatic License Plate Reader
 
+#DEMO
+
+https://youtu.be/F1JOvA1UXHw
+
 Projekat je tek u fazi alfa testiranja, i nije namenjen za ozbiljnu upotrebu.
 
 Iako se ovaj projekat moze upotrebiti za bilo koju regiju, ukljucena su podesavanja za srpsko podrucje. Tu se nalazi fajl koji je treniran na 20.000 srpskih tablica.
